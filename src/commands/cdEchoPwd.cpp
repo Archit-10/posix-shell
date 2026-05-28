@@ -1,73 +1,86 @@
 #include <iostream>
 #include <unistd.h>
-#include <cstdlib> 
-#include <cstring>
+#include <cstdlib>
 
 using namespace std;
 
-bool cd(const string &path) {
-    if (path.empty()) {
-        const char *home_dir = getenv("HOME");
-        if (home_dir == nullptr) {
-            cerr << "Error: HOME variable is not set" << endl;
+/*
+    CD IMPLEMENTATION (POSIX-style simplified)
+*/
+bool cd(const string &path)
+{
+    char old_dir[8192];
+
+    // store current directory before changing
+    if (getcwd(old_dir, sizeof(old_dir)) == nullptr)
+    {
+        perror("getcwd");
+        return false;
+    }
+
+    const char *target = nullptr;
+
+    if (path.empty() || path == "~")
+    {
+        target = getenv("HOME");
+        if (target == nullptr)
+        {
+            cerr << "Error: HOME variable not set\n";
             return false;
-        }
-        if (chdir(home_dir) != 0) {
-            perror("chdir");
-            return false;
-        }
-    } else {
-        if (path == "~") {
-            const char *home_dir = getenv("HOME");
-            if (home_dir == nullptr) {
-                cerr << "Error: HOME variable is not set." << endl;
-                return false;
-            }
-            if (chdir(home_dir) != 0) {
-                perror("chdir");
-                return false;
-            }
-        } else if (path == ".") {
-            
-        } else if (path == "..") {
-            if (chdir("..") != 0) {
-                perror("chdir");
-                return false;
-            }
-        } else if (path == "-") {
-            const char *previous_dir = getenv("OLDPWD");
-            if (previous_dir == nullptr) {
-                cerr << "Error: OLDPWD variable is not set." << endl;
-                return false;
-            }
-            if (chdir(previous_dir) != 0) {
-                perror("chdir");
-                return false;
-            }
-        } else {
-            if (chdir(path.c_str()) != 0) {
-                perror("chdir");
-                return false;
-            }
         }
     }
-    setenv("OLDPWD", current_directory, 1);
+    else if (path == "-")
+    {
+        target = getenv("OLDPWD");
+        if (target == nullptr)
+        {
+            cerr << "Error: OLDPWD not set\n";
+            return false;
+        }
+    }
+    else if (path == ".")
+    {
+        return true; // no-op
+    }
+    else
+    {
+        target = path.c_str();
+    }
+
+    // change directory
+    if (chdir(target) != 0)
+    {
+        perror("chdir");
+        return false;
+    }
+
+    // update OLDPWD
+    setenv("OLDPWD", old_dir, 1);
+
     return true;
 }
 
-void pwd() {
-    const int BUFFER_SIZE = 8192;
-    char current_directory[BUFFER_SIZE];
-    if (getcwd(current_directory, BUFFER_SIZE) != nullptr) {
+/*
+    PWD IMPLEMENTATION
+*/
+void pwd()
+{
+    char current_directory[8192];
+
+    if (getcwd(current_directory, sizeof(current_directory)) != nullptr)
+    {
         cout << current_directory << endl;
-    } else {
+    }
+    else
+    {
         perror("getcwd");
     }
 }
 
-void echo(const string &text) {
+/*
+    ECHO IMPLEMENTATION
+*/
+void echo(const string &text)
+{
     cout << text << endl;
 }
-
-
-

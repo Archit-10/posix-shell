@@ -32,8 +32,11 @@ void save_history(const vector<string> &history)
 
 void display_history(const vector<string> &history, int num = max_commands)
 {
-    int start = max(0, (int)history.size() - num);
-    for (int i = start; i < history.size(); ++i)
+    size_t start = (history.size() > (size_t)num)
+                       ? history.size() - num
+                       : 0;
+
+    for (size_t i = start; i < history.size(); ++i)
     {
         cout << history[i] << endl;
     }

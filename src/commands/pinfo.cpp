@@ -4,23 +4,24 @@
 #include <cstring>
 #include <unistd.h>
 #include <sys/types.h>
-
+#include "pinfo.hpp"
 using namespace std;
 
+void pinfo(int pid)
+{
 
-void pinfo(int pid) {
-   
     stringstream stat_path;
     stat_path << "/proc/" << pid << "/stat";
 
     ifstream stat_file(stat_path.str().c_str());
-    if (!stat_file) {
+    if (!stat_file)
+    {
         perror("pinfo");
         return;
     }
-   
+
     string s;
-    getline(stat_file,s);
+    getline(stat_file, s);
     istringstream iss(s);
 
     int process_pid;
@@ -33,24 +34,33 @@ void pinfo(int pid) {
     stat_file.close();
 
     string status_str;
-    if (process_status == 'R' || process_status == 'S') {
+    if (process_status == 'R' || process_status == 'S')
+    {
         status_str = process_status;
-        if (pid == getpid()) {
-            status_str += "+";  
+        if (pid == getpid())
+        {
+            status_str += "+";
         }
-    } else if (process_status == 'Z') {
+    }
+    else if (process_status == 'Z')
+    {
         status_str = "Zombie";
-    } else if (process_status == 'T') {
+    }
+    else if (process_status == 'T')
+    {
         status_str = "Stopped (on a signal)";
-    } else {
-        status_str = "Unknown"; 
+    }
+    else
+    {
+        status_str = "Unknown";
     }
 
- stringstream mem_path;
+    stringstream mem_path;
     mem_path << "/proc/" << pid << "/statm";
 
     ifstream mem_file(mem_path.str());
-    if (!mem_file) {
+    if (!mem_file)
+    {
         perror("pinfo memory");
         return;
     }
@@ -58,27 +68,23 @@ void pinfo(int pid) {
     unsigned long size, resident, shared, text, lib, data, dt;
     mem_file >> size >> resident >> shared >> text >> lib >> data >> dt;
     mem_file.close();
-   
-    const unsigned long page_size_kb = sysconf(_SC_PAGE_SIZE) / 1024;
-   
+
     stringstream exe_path;
     exe_path << "/proc/" << pid << "/exe";
 
     char exe_buffer[1024];
     ssize_t exe_len = readlink(exe_path.str().c_str(), exe_buffer, sizeof(exe_buffer) - 1);
-    if (exe_len != -1) {
+    if (exe_len != -1)
+    {
         exe_buffer[exe_len] = '\0';
-    } else {
+    }
+    else
+    {
         perror("pinfo");
     }
 
     cout << "pid -- " << process_pid << endl;
     cout << "Process Status -- {" << status_str << "}" << endl;
-    cout << "memory -- ";  
+    cout << "memory -- ";
     cout << "Executable Path -- " << exe_buffer << endl;
 }
-
-
-
-
-

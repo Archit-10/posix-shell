@@ -63,9 +63,3 @@ void autocomplete(string &command)
         cout << "\r" << command;
     }
 }
-
-void handle_eof()
-{
-    cout << "\nExiting shell." << endl;
-    exit(0);
-}

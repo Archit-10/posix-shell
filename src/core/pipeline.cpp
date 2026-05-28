@@ -1,85 +1,82 @@
 #include <iostream>
 #include <sstream>
 #include <vector>
-#include <sys/types.h>
-#include <sys/wait.h>
 #include <unistd.h>
-#include <cstring>
-#include <fcntl.h>
-
+#include <sys/wait.h>
+#include "executor.hpp"
 using namespace std;
 
 void execute_pipeline(string cmd)
 {
     istringstream iss(cmd);
     vector<string> commands;
-    string command;
+    string segment;
 
-    while (getline(iss, command, '|'))
+    // Split by pipe
+    while (getline(iss, segment, '|'))
     {
-        commands.push_back(command);
+        commands.push_back(segment);
     }
 
-    int pipefds[2 * (commands.size() - 1)];
+    int n = commands.size();
+    if (n == 0)
+        return;
 
-    for (size_t i = 0; i < commands.size() - 1; i++)
+    std::vector<int> pipefds(2 * (n - 1));
+
+    for (int i = 0; i < n - 1; i++)
     {
-        if (pipe(pipefds + i * 2) == -1)
+        if (pipe(&pipefds[i * 2]) < 0)
         {
             perror("pipe");
             return;
         }
     }
 
-    for (size_t i = 0; i < commands.size(); i++)
+    for (int i = 0; i < n; i++)
     {
-        pid_t child_pid = fork();
+        pid_t pid = fork();
 
-        if (child_pid == 0)
+        if (pid == 0)
         {
-
+            // input from previous pipe
             if (i > 0)
             {
-                dup2(pipefds[(i - 1) * 2], STDIN_FILENO);
-            }
-            if (i < commands.size() - 1)
-            {
-                dup2(pipefds[i * 2 + 1], STDOUT_FILENO);
+                dup2(pipefds[(i - 1) * 2], 0);
             }
 
-            for (size_t j = 0; j < (commands.size() - 1) * 2; j++)
+            // output to next pipe
+            if (i < n - 1)
+            {
+                dup2(pipefds[i * 2 + 1], 1);
+            }
+
+            // close all pipe fds
+            for (int j = 0; j < 2 * (n - 1); j++)
             {
                 close(pipefds[j]);
             }
 
-            istringstream command_stream(commands[i]);
-            vector<char *> args;
-            string token;
-            while (command_stream >> token)
-            {
-                args.push_back(strdup(token.c_str()));
-            }
-            args.push_back(nullptr);
+            // execute single command using executor
+            execute_command(commands[i], false);
 
-            if (execvp(args[0], args.data()) == -1)
-            {
-                perror("Error executing command");
-                exit(EXIT_FAILURE);
-            }
+            exit(0);
         }
-        else if (child_pid < 0)
+        else if (pid < 0)
         {
             perror("fork");
             return;
         }
     }
 
-    for (size_t i = 0; i < (commands.size() - 1) * 2; i++)
+    // parent closes pipes
+    for (int i = 0; i < 2 * (n - 1); i++)
     {
         close(pipefds[i]);
     }
 
-    for (size_t i = 0; i < commands.size(); i++)
+    // wait children
+    for (int i = 0; i < n; i++)
     {
         wait(nullptr);
     }

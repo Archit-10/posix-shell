@@ -10,7 +10,7 @@
 
 using namespace std;
 
-void execute_command_with_redirection(string cmd)
+void execute_command_with_redirection(const std::string &cmd)
 {
     istringstream iss(cmd);
     vector<string> args;

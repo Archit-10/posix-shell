@@ -1,0 +1,5 @@
+*.o
+Posix_Shell
+*.out
+*.log
+

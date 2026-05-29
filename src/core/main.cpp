@@ -17,6 +17,16 @@ int main()
         string command;
         getline(cin, command);
 
+        bool background = false;
+
+        if (!command.empty() && command.back() == '&')
+        {
+            background = true;
+            command.pop_back();
+        }
+
+        execute_command(command, background);
+
         // Exit condition for testing
         if (command == "exit")
         {

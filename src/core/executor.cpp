@@ -4,11 +4,36 @@
 #include <vector>
 #include <sstream>
 #include <cstring>
-
+#include "../commands/cdEchoPwd.hpp"
 using namespace std;
 
 void execute_command(string cmd, bool background)
 {
+
+    istringstream iss(cmd);
+    string command;
+    iss >> command;
+
+    if (command == "cd" || command == "pwd" || command == "echo")
+    {
+        if (command == "cd")
+        {
+            string path;
+            iss >> path;
+            cd(path); // your function
+        }
+        else if (command == "pwd")
+        {
+            pwd();
+        }
+        else if (command == "echo")
+        {
+            string rest;
+            getline(iss, rest);
+            echo(rest);
+        }
+        return;
+    }
     pid_t pid = fork();
 
     if (pid < 0)

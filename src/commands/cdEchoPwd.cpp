@@ -1,53 +1,84 @@
 #include <iostream>
 #include <unistd.h>
 #include <cstdlib>
+#include <cstring>
+#include <limits.h>
 
 using namespace std;
 
-/*
-    CD IMPLEMENTATION (POSIX-style simplified)
-*/
+/* ---------------------------
+   CD IMPLEMENTATION
+----------------------------*/
 bool cd(const string &path)
 {
-    char old_dir[8192];
+    char current_dir[PATH_MAX];
 
-    // store current directory before changing
-    if (getcwd(old_dir, sizeof(old_dir)) == nullptr)
+    // store current directory
+    if (getcwd(current_dir, sizeof(current_dir)) == nullptr)
     {
         perror("getcwd");
         return false;
     }
 
     const char *target = nullptr;
+    string resolved_path;
 
+    // ---------------------------
+    // CASE 1: empty or "~"
+    // ---------------------------
     if (path.empty() || path == "~")
     {
         target = getenv("HOME");
-        if (target == nullptr)
+        if (!target)
         {
-            cerr << "Error: HOME variable not set\n";
+            cerr << "Error: HOME not set\n";
             return false;
         }
     }
+
+    // ---------------------------
+    // CASE 2: previous directory
+    // ---------------------------
     else if (path == "-")
     {
         target = getenv("OLDPWD");
-        if (target == nullptr)
+        if (!target)
         {
             cerr << "Error: OLDPWD not set\n";
             return false;
         }
+
+        cout << target << endl; // mimic bash behavior
     }
-    else if (path == ".")
-    {
-        return true; // no-op
-    }
-    else
+
+    // ---------------------------
+    // CASE 3: absolute path
+    // ---------------------------
+    else if (path[0] == '/')
     {
         target = path.c_str();
     }
 
-    // change directory
+    // ---------------------------
+    // CASE 4: relative path
+    // ---------------------------
+    else
+    {
+        char temp[PATH_MAX];
+
+        if (getcwd(temp, sizeof(temp)) == nullptr)
+        {
+            perror("getcwd");
+            return false;
+        }
+
+        resolved_path = string(temp) + "/" + path;
+        target = resolved_path.c_str();
+    }
+
+    // ---------------------------
+    // CHANGE DIRECTORY
+    // ---------------------------
     if (chdir(target) != 0)
     {
         perror("chdir");
@@ -55,17 +86,17 @@ bool cd(const string &path)
     }
 
     // update OLDPWD
-    setenv("OLDPWD", old_dir, 1);
+    setenv("OLDPWD", current_dir, 1);
 
     return true;
 }
 
-/*
-    PWD IMPLEMENTATION
-*/
+/* ---------------------------
+   PWD IMPLEMENTATION
+----------------------------*/
 void pwd()
 {
-    char current_directory[8192];
+    char current_directory[PATH_MAX];
 
     if (getcwd(current_directory, sizeof(current_directory)) != nullptr)
     {
@@ -77,10 +108,10 @@ void pwd()
     }
 }
 
-/*
-    ECHO IMPLEMENTATION
-*/
+/* ---------------------------
+   ECHO IMPLEMENTATION
+----------------------------*/
 void echo(const string &text)
 {
-    cout << text << endl;
+    cout << text << "\n";
 }

@@ -12,6 +12,9 @@ void execute_pipeline(string cmd)
     vector<string> commands;
     string segment;
 
+    if (!cmd.empty() && cmd.back() == '\n')
+        cmd.pop_back();
+
     // Split by pipe
     while (getline(iss, segment, '|'))
     {

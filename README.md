@@ -14,7 +14,7 @@
 </ul>
 
 
-<h2>Technical Highlights ⚙</h2>
+<h2>Technical Highlights </h2>
 
 <ul>
   <li><strong>Low-Level System Calls</strong>: Implements direct POSIX-compliant system calls like <code>getcwd</code>, <code>chdir</code>, and others, simulating native shell behaviors.</li>
@@ -30,40 +30,176 @@
   <li><strong>Version Control</strong>: Managed using Git and organized for seamless collaboration.</li>
 </ul>
 
-<h2><strong>Why Choose This Shell? </strong></h2>
-<p>This POSIX Shell implementation stands out for its focus on user-friendly features and robust functionality. Designed for both novice and experienced users, it offers:</p>
-<ul>
-    <li><strong>Simplicity and Efficiency:</strong> Enjoy a streamlined interface that prioritizes ease of use without sacrificing power.</li>
-        <li><strong>Comprehensive Documentation:</strong> Access clear and concise documentation to help users navigate and utilize all available features effectively.</li>
-      <li><strong>Troubleshooting Section:</strong> Common issues and solutions to enhance user experience.</li>
-    <li><strong>Future-Ready:</strong> Built with extensibility in mind, making it easy to introduce new features and enhancements as user needs evolve.</li>
-
-</ul>
+<h2> Architecture Overview </h2>
 
 
-<h2>Getting Started </h2>
+The shell is designed with a modular architecture separating:
 
-<ol>
-  <li><strong>Clone the repository</strong>:
-    <pre><code>git clone https://github.com/your-username/POSIX_Shell_Implementation.git
-cd POSIX_Shell_Implementation</code></pre>
-  </li>
-  <li><strong>Compile and Run</strong>:
-    <pre><code>make
-./my_shell</code></pre>
-  </li>
-  <li><strong>Start Exploring</strong>: Enter commands like <code>cd</code>, <code>pwd</code>, <code>echo Hello World!</code>, and more!</li>
-</ol>
+* Core execution engine
+* Pipeline handling
+* I/O redirection
+* Built-in command implementations
+* Shell utilities
+* Interactive shell features
 
-<h2><strong>Future Enhancements 🌱</strong></h2>
-<ul>
-    <li><strong>Custom Aliases:</strong> Allow users to create shortcuts for frequently used commands for quicker access.</li>
-    <li><strong>Enhanced Help System:</strong> Implement a detailed help system for commands to assist users in understanding usage and options.</li>
-    <li><strong>Multi-Session Support:</strong> Enable users to run multiple shell sessions simultaneously for increased productivity.</li>
-    <li><strong>Plugin System:</strong> Introduce a framework for users to extend functionality with plugins, allowing for greater customization.</li>
-</ul>
+This separation improves maintainability, extensibility, and debugging efficiency while mirroring the layered design commonly used in production-grade systems software.
 
+---
 
+<h2> Key Features </h2>
+
+<h2> Command Execution</h2>
+
+* Process creation using `fork()`
+* Program execution using `execvp()`
+* Foreground and background process handling
+* Parent-child synchronization using `waitpid()`
+
+<h2> I/O Redirection </h2>
+
+* Input redirection (`<`)
+* Output overwrite redirection (`>`)
+* Output append redirection (`>>`)
+* File descriptor manipulation using `dup2()`
+
+<h2> Pipeline Execution </h2>
+
+* Multi-stage command pipelines using `pipe()`
+* Inter-process communication between child processes
+* Chained execution of shell commands
+
+<h2> Built-in Commands</h2>
+
+* `cd`
+* `pwd`
+* `echo`
+* `history`
+* `pinfo`
+
+<h2> Interactive Shell Features </h2>
+
+* Persistent command history
+* Custom shell prompt
+* Background process execution (`&`)
+* Command parsing and tokenization
+
+---
+
+ <h2> Technologies & Concepts</h2>
+
+| Domain                 | Technologies / Concepts               |
+| ---------------------- | ------------------------------------- |
+| Language               | C++                                   |
+| OS Concepts            | POSIX, UNIX Process Model             |
+| Process Management     | `fork()`, `execvp()`, `waitpid()`     |
+| IPC                    | `pipe()`                              |
+| File Systems           | `open()`, `dup2()`, `close()`         |
+| Environment Management | `getenv()`, `setenv()`                |
+| Signals                | Signal Handling                       |
+| Shell Design           | Parsing, Tokenization, Execution Flow |
+
+---
+
+<h2>Project Structure</h2>
+
+```bash id="sxjlwm"
+src/
+├── commands/      # Built-in shell commands
+├── core/          # Execution engine and pipelines
+├── features/      # Shell features and utilities
+├── utilities/     # Helper modules and prompt handling
+```
+
+---
+
+<h2> Build & Execution</h2> 
+
+## Build
+
+```bash id="ob9e59"
+make -f Makefile.mk
+```
+
+## Run
+
+```bash id="hsr0lt"
+./Posix_Shell
+```
+
+---
+
+<h2>Example Usage</h2>
+
+<h2>Standard Commands</h2>
+
+<pre><code>pwd
+ls
+echo hello world</code></pre>
+
+<h2>Pipeline Execution</h2>
+
+<pre><code>ls | wc -l
+cat file.txt | grep main</code></pre>
+
+<h2>I/O Redirection</h2>
+
+<pre><code>echo hello > out.txt
+cat < out.txt</code></pre>
+
+<h2>Background Execution</h2>
+
+<pre><code>sleep 10 &</code></pre>
+
+<h2> Challenges Addressed </h2>
+
+* Managing child processes without resource leakage
+* Correct handling of file descriptors across pipelines
+* Maintaining process synchronization across chained commands
+* Avoiding duplicate symbol linkage issues in modular compilation
+* Handling shell parsing edge cases for redirection and background execution
+* Preserving shell state across directory changes and history persistence
+
+---
+
+<h2> QA </h2>
+
+The shell was manually validated across multiple command execution scenarios, including:
+
+* Foreground and background process execution
+* Multi-stage pipelines
+* File descriptor redirection correctness
+* Built-in command behavior
+* Invalid command handling
+* Directory traversal edge cases
+* Concurrent process execution scenarios
+
+Example validation cases:
+
+```bash id="6b2x2g"
+ls | grep cpp
+echo hello world | wc
+cat file.txt | grep main > out.txt
+sleep 5 &
+```
+
+---
+
+<h2> Future Scope </h2>
+
+Planned enhancements include:
+
+* Job control (`jobs`, `fg`, `bg`)
+* Advanced signal handling
+* Multi-command execution using `;`
+* Bash-style auto-completion
+* Environment variable expansion
+* Quote-aware command parsing
+* Alias support
+* Configuration file support (`.rc`)
+* Improved terminal interaction using `readline`
+* Process monitoring dashboard
+
+---
 
 <h2>Contributions</h2>
 <p> Welcome contributions from the community! If you're interested in contributing, please follow these steps:</p>
@@ -72,7 +208,7 @@ cd POSIX_Shell_Implementation</code></pre>
     <li>Create a new branch for your feature or bug fix.</li>
     <li>Make your changes and commit them with clear messages.</li>
     <li>Push your changes to your forked repository.</li>
-    <li>Submit a pull request detailing your changes and the motivation behind them.</li>
+    <li>Submit a PR detailing your changes and the motivation behind them.</li>
 </ol>
 <p>Appreciate your interest in contributing and will review your pull request as soon as possible!</p>
 

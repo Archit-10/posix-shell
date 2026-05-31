@@ -25,14 +25,6 @@ int main()
             command.pop_back();
         }
 
-        execute_command(command, background);
-
-        // Exit condition for testing
-        if (command == "exit")
-        {
-            break; // Exit the loop
-        }
-
         if (command.find('|') != string::npos)
         {
             execute_pipeline(command);
@@ -41,10 +33,8 @@ int main()
         {
             execute_command_with_redirection(command);
         }
-        else
-        {
-            execute_command(command, false);
-        }
+        else if (!execute_command(command, background))
+            break;
     }
     return 0; // Return success
 }

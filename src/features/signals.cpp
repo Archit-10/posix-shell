@@ -7,8 +7,14 @@
 #include <cstring>
 #include <fcntl.h>
 #include <csignal>
-
+#include "signals.hpp"
 using namespace std;
+
+void setup_signal_handlers()
+{
+    signal(SIGINT, sigint_handler);
+    signal(SIGTSTP, sigtstp_handler);
+}
 
 pid_t foreground_pid = -1;
 void sigint_handler(int signo)

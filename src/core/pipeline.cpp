@@ -6,7 +6,7 @@
 #include "executor.hpp"
 using namespace std;
 
-void execute_pipeline(string cmd)
+void execute_pipeline(string cmd, vector<string> &history)
 {
     istringstream iss(cmd);
     vector<string> commands;
@@ -18,6 +18,14 @@ void execute_pipeline(string cmd)
     // Split by pipe
     while (getline(iss, segment, '|'))
     {
+        size_t start = segment.find_first_not_of(" \t");
+        size_t end = segment.find_last_not_of(" \t");
+
+        if (start == string::npos)
+            continue;
+
+        segment = segment.substr(start, end - start + 1);
+
         commands.push_back(segment);
     }
 
@@ -61,7 +69,7 @@ void execute_pipeline(string cmd)
             }
 
             // execute single command using executor
-            execute_command(commands[i], false);
+            execute_command(commands[i], false, history);
 
             exit(0);
         }

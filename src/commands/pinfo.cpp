@@ -72,19 +72,24 @@ void pinfo(int pid)
     stringstream exe_path;
     exe_path << "/proc/" << pid << "/exe";
 
-    char exe_buffer[1024];
-    ssize_t exe_len = readlink(exe_path.str().c_str(), exe_buffer, sizeof(exe_buffer) - 1);
+    char exe_buffer[1024] = "Unavailable";
+
+    ssize_t exe_len =
+        readlink(
+            exe_path.str().c_str(),
+            exe_buffer,
+            sizeof(exe_buffer) - 1);
     if (exe_len != -1)
     {
         exe_buffer[exe_len] = '\0';
     }
     else
     {
-        perror("pinfo");
+        strcpy(exe_buffer, "Permission Denied");
     }
 
     cout << "pid -- " << process_pid << endl;
     cout << "Process Status -- {" << status_str << "}" << endl;
-    cout << "memory -- ";
+    cout << "memory -- " << resident << endl;
     cout << "Executable Path -- " << exe_buffer << endl;
 }

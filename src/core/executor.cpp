@@ -5,9 +5,13 @@
 #include <sstream>
 #include <cstring>
 #include "../commands/cdEchoPwd.hpp"
+#include "../features/history.hpp"
+#include "../commands/pinfo.hpp"
+#include "../utilities/search.hpp"
+#include "../features/signals.hpp"
 using namespace std;
 
-bool execute_command(string cmd, bool background)
+bool execute_command(string cmd, bool background, vector<string> &history)
 {
     istringstream iss(cmd);
     string command;
@@ -16,7 +20,7 @@ bool execute_command(string cmd, bool background)
     if (command == "exit")
         return false;
 
-    if (command == "cd" || command == "pwd" || command == "echo")
+    if (command == "cd" || command == "pwd" || command == "echo" || command == "history" || command == "pinfo" || command == "search")
     {
         if (background)
             cout << "Warning: builtin commands cannot be run in background\n";
@@ -35,7 +39,45 @@ bool execute_command(string cmd, bool background)
         {
             string rest;
             getline(iss, rest);
+
+            while (!rest.empty() && rest.front() == ' ')
+                rest.erase(rest.begin());
+
+            while (!rest.empty() && rest.back() == ' ')
+                rest.pop_back();
+
             echo(rest);
+        }
+        else if (command == "history")
+        {
+            display_history(history);
+        }
+
+        else if (command == "pinfo")
+        {
+            int pid;
+
+            if (!(iss >> pid))
+            {
+                pid = getpid();
+            }
+
+            pinfo(pid);
+        }
+        else if (command == "search")
+        {
+            string name;
+
+            if (!(iss >> name))
+            {
+                cout << "Usage: search <filename>" << endl;
+            }
+            else
+            {
+                bool found = search(name);
+
+                cout << (found ? "True" : "False") << endl;
+            }
         }
         return true;
     }
@@ -65,9 +107,18 @@ bool execute_command(string cmd, bool background)
     else
     {
         if (!background)
+        {
+            foreground_pid = pid;
+
             waitpid(pid, nullptr, 0);
+
+            foreground_pid = -1;
+        }
+
         else
+        {
             cout << "Background PID: " << pid << endl;
+        }
     }
     return true;
 }

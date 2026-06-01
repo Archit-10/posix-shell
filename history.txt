@@ -1,0 +1,20 @@
+ls -la
+cat out.txt
+echo hello > test.txt
+cat test.txt
+cat < test.txtecho world >> test.txt
+echo world >> test.txt
+cd src
+    foreground_pid = pid;
+    waitpid(pid, nullptr, 0);
+    foreground_pid = -1;sleep 30
+sleep 30
+sleep 30
+pwd
+ls
+sleep 30 &
+search README.md
+git status
+git add .
+[A
+git commit -m "wire up shell core: execution, pipes, redirection, history, signals"

@@ -1,6 +1,6 @@
 <h1>POSIX Shell Implementation </h1>
 
-<p>Welcome to my <strong>Custom POSIX Shell</strong> project! This shell isn’t just another terminal interface – it’s built from the ground up, designed to explore the nuances of system calls, error handling, and command-line operations with features that aim to enhance both utility and user experience. Whether you're exploring directory paths or handling process control, this shell has you covered!</p>
+<p>A high-performance, robust command-line interpreter engineered from the ground up to handle POSIX-compliant process execution, pipeline architecture, and precise system resource management. This implementation bridges low-level kernel APIs with an efficient user-space interface, focusing on strict error handling, signal processing, and low-latency command execution.</p>
 
 <h2><strong>Key Features</strong></h2>
 <ul>

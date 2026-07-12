@@ -1,6 +1,8 @@
 <h1>POSIX Shell Implementation </h1>
 
-<p>A high-performance, robust command-line interpreter engineered from the ground up to handle POSIX-compliant process execution, pipeline architecture, and precise system resource management. This implementation bridges low-level kernel APIs with an efficient user-space interface, focusing on strict error handling, signal processing, and low-latency command execution.</p>
+## Introduction
+
+This project implements a POSIX-compliant command-line shell in C++. It supports command execution, pipelines, I/O redirection, background processes, and built-in commands using POSIX system calls such as `fork()`, `execvp()`, `pipe()`, `dup2()`, and `waitpid()`.
 
 <h2><strong>Key Features</strong></h2>
 <ul>
@@ -150,14 +152,19 @@ cat < out.txt</code></pre>
 
 <pre><code>sleep 10 &</code></pre>
 
-<h2> Challenges Addressed </h2>
+## Challenges & Solutions
 
-* Managing child processes without resource leakage
-* Correct handling of file descriptors across pipelines
-* Maintaining process synchronization across chained commands
-* Avoiding duplicate symbol linkage issues in modular compilation
-* Handling shell parsing edge cases for redirection and background execution
-* Preserving shell state across directory changes and history persistence
+- **Challenge:** Managing child processes without resource leakage.  
+  **Solution:** Used `waitpid()` to synchronize and clean up child processes.
+
+- **Challenge:** Handling file descriptors across pipelines and redirections.  
+  **Solution:** Used `dup2()` for redirection and closed unused descriptors to prevent leaks.
+
+- **Challenge:** Parsing shell commands with pipelines, redirection, and background execution.  
+  **Solution:** Implemented modular command parsing and tokenization before execution.
+
+- **Challenge:** Preserving shell state across commands.  
+  **Solution:** Maintained the current working directory and command history throughout the shell session.
 
 ---
 
@@ -210,5 +217,5 @@ Planned enhancements include:
     <li>Push your changes to your forked repository.</li>
     <li>Submit a PR detailing your changes and the motivation behind them.</li>
 </ol>
-<p>Appreciate your interest in contributing and will review your pull request as soon as possible!</p>
+<p>Appreciate your interest in contributing and will review your PR as soon as possible!</p>
 
